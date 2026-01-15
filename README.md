@@ -8,7 +8,11 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 
 ## Showcase
 
-![BlackArch Tool Manager Demo](https://www.youtube.com/watch?v=PxLzP1xjdSI)
+<video width="1080" height="660" controls autoplay muted>
+  <source src="assets/video.mov" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 
 ---
 
@@ -27,12 +31,15 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 - Search **every BlackArch tool** instantly
 - Fuzzy matching powered by `fzf`
 
+![](assets/favorite-recent.png)
+
 ### ⭐ Favorites System
 
 - Mark tools as favorites
 - Favorites persist across sessions
 - ⭐ icon displayed next to favorite tools
 - Dedicated **Favorites** category
+![](assets/recent.png)
 
 ### 🕘 Recent Tools
 
@@ -44,18 +51,31 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 - Install tools directly via `pacman`
 - Uninstall cleanly with dependency removal
 - Installed tools detected automatically
-
+![](assets/installing.png)
 ### 🧠 Full Tool Information
 
 - Scrollable **full package descriptions**
 - Uses `pacman -Si`
 - Preview pane supports long descriptions
 
+![](assets/tool-menu.png)
+
+### 🔧 Tool Actions Menu
+- After selecting a tool, choose to:
+  - Run in floating terminal
+  - Open pre-filled command terminal
+  - Install / Uninstall
+  - Open tool homepage
+  - Add / Remove from favorites
+![when tool is not installed](assets/action-menu1.png)
+![when tool is installed](assets/action-menu2.png)
 ### 🚀 Run Tools in Floating Terminal
 
 - Tools run inside a **floating Kitty terminal**
 - Terminal stays open after execution
 - Password prompt handled correctly
+
+![](assets/run-directly.png)
 
 ### ⚡ Open Pre-Filled Command Terminal
 
@@ -68,6 +88,7 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 - Editable before execution
 - Perfect for tools with arguments
 
+![](assets/run-tools.png)
 ### 🌐 Open Tool Homepage
 
 - Automatically extracts tool URL
@@ -95,7 +116,6 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 | `Esc` | Go back |
 | `↑` `↓` | Navigate |
 | `/` | Fuzzy search |
-| `Ctrl+U` / `Ctrl+D` | Scroll preview |
 | `Tab` | Cycle selections |
 
 > Favorites are managed from the Action Menu.
@@ -189,19 +209,7 @@ You can easily:
 - Modify floating window size
 - Adjust preview layout
 
-> Script is cleanly structured and hackable.
-
----
-
-## 📸 Screenshots
-
-*Add screenshots here (recommended):*
-
-- Main category menu
-- Tool list with ⭐ favorites
-- Action menu
-- Install preview
-- Floating terminal
+> Script is cleanly structured and modifiable.
 
 ---
 
