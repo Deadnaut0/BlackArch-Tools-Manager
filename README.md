@@ -20,7 +20,7 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 - Clean, emoji-enhanced category list
 - No empty or broken categories
 
-![](assets/category-menu.png)
+![](assets/tool-menu.png)
 
 ### 🔍 Search All Tools
 
