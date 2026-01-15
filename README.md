@@ -16,6 +16,14 @@ https://github.com/user-attachments/assets/a9c8aa97-df12-47a2-ae9b-f5f21b62962e
 https://www.youtube.com/watch?v=PxLzP1xjdSI
 
 
+
+<video width="800" controls>
+  <source src="assets/showcase.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+
+
 ---
 
 ## ✨ Features
