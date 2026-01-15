@@ -1,4 +1,5 @@
-# 🖤 BlackArch GUI Launcher (fzf-based)
+# 🖤 BlackArch Tools Manager
+
 
 A **fully interactive, GUI-style terminal launcher** for **BlackArch Linux tools**, built with `bash + fzf`.
 
