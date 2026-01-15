@@ -1,0 +1,381 @@
+#!/usr/bin/env bash
+# -----------------------------
+# CONFIG
+# -----------------------------
+TERM="kitty"
+FAV_FILE="$HOME/.config/blackarch-tools-script/favorites.conf"
+RECENT_FILE="$HOME/.config/blackarch-tools-script/recent.conf"
+CONFIG_DIR="$(dirname "$FAV_FILE")"
+RED=$'\033[31m'
+GREEN=$'\033[32m'
+YELLOW=$'\033[33m'
+BLUE=$'\033[34m'
+RESET=$'\033[0m'
+INSTALLED_TOOLS="$HOME/.config/blackarch-tools-script/installed_tools.cache"
+# Create config directory if it does not exist
+if [[ ! -d "$CONFIG_DIR" ]]; then
+  mkdir -p "$CONFIG_DIR"
+fi
+# Create favorites file if it does not exist
+if [[ ! -f "$FAV_FILE" ]]; then
+  touch "$FAV_FILE"
+fi
+# Create recent file if it does not exist
+if [[ ! -f "$RECENT_FILE" ]]; then
+  touch "$RECENT_FILE"
+fi
+generate_installed_tools_cache() {
+  pacman -Qqe | grep -E "$(pacman -Sl "blackarch" | cut -d' ' -f2)" >$INSTALLED_TOOLS
+}
+generate_installed_tools_cache
+# -----------------------------
+# CATEGORY MAP
+# -----------------------------
+declare -A CATMAP=(
+  ["blackarch-webapp"]="🌐 Web Application"
+  ["blackarch-fuzzer"]="🧪 Fuzzing"
+  ["blackarch-scanner"]="📡 Scanners"
+  ["blackarch-proxy"]="🕸 Proxy"
+  ["blackarch-windows"]="🪟 Windows"
+  ["blackarch-dos"]="💣 DoS"
+  ["blackarch-disassembler"]="🧩 Disassembler"
+  ["blackarch-sniffer"]="👂 Sniffers"
+  ["blackarch-voip"]="📞 VoIP"
+  ["blackarch-fingerprint"]="🆔 Fingerprinting"
+  ["blackarch-networking"]="🌐 Networking"
+  ["blackarch-recon"]="🔎 Reconnaissance"
+  ["blackarch-cracker"]="🔓 Cracking"
+  ["blackarch-exploitation"]="💥 Exploitation"
+  ["blackarch-spoof"]="🎭 Spoofing"
+  ["blackarch-ai"]="🤖 AI"
+  ["blackarch-defensive"]="🛡 Defensive"
+  ["blackarch-forensic"]="🕵️ Forensics"
+  ["blackarch-crypto"]="🔐 Crypto"
+  ["blackarch-backdoor"]="🚪 Backdoors"
+  ["blackarch-wireless"]="📡 Wireless"
+  ["blackarch-automation"]="⚙ Automation"
+  ["blackarch-radio"]="📻 Radio"
+  ["blackarch-binary"]="📦 Binary"
+  ["blackarch-packer"]="🧳 Packers"
+  ["blackarch-reversing"]="🧠 Reverse Engineering"
+  ["blackarch-mobile"]="📱 Mobile"
+  ["blackarch-malware"]="☣ Malware"
+  ["blackarch-code-audit"]="🧾 Code Audit"
+  ["blackarch-social"]="👥 Social Engineering"
+  ["blackarch-honeypot"]="🍯 Honeypot"
+  ["blackarch-misc"]="📦 Misc"
+  ["blackarch-wordlist"]="📜 Wordlists"
+  ["blackarch-decompiler"]="🔁 Decompiler"
+  ["blackarch-config"]="🛠 Config"
+  ["blackarch-debugger"]="🐞 Debugger"
+  ["blackarch-bluetooth"]="📶 Bluetooth"
+  ["blackarch-database"]="🗄 Database"
+  ["blackarch-automobile"]="🚗 Automobile"
+  ["blackarch-hardware"]="🔌 Hardware"
+  ["blackarch-nfc"]="📳 NFC"
+  ["blackarch-tunnel"]="🚇 Tunneling"
+  ["blackarch-drone"]="🚁 Drone"
+  ["blackarch-unpacker"]="📤 Unpacker"
+  ["blackarch-firmware"]="💾 Firmware"
+  ["blackarch-keylogger"]="⌨ Keylogger"
+  ["blackarch-stego"]="🖼 Steganography"
+  ["blackarch-anti-forensic"]="🕶 Anti-Forensic"
+  ["blackarch-ids"]="🚨 IDS"
+  ["blackarch-threat-model"]="📊 Threat Modeling"
+  ["blackarch-gpu"]="🎮 GPU"
+  ["__FAVORITES__"]="⭐ Favorites"
+  ["__SEARCH__"]="🔍 Search All Tools"
+  ["__RECENT__"]="🕘 Recent Tools"
+)
+# -----------------------------
+# HELPER FUNCTIONS
+# -----------------------------
+is_favorite() {
+  grep -qx "$1" "$FAV_FILE" 2>/dev/null
+}
+is_installed() {
+  [[ -f "$INSTALLED_TOOLS" ]] || generate_installed_tools_cache
+  grep -qx "$1" "$INSTALLED_TOOLS"
+}
+toggle_favorite() {
+  local TOOL="$1"
+  if is_favorite "$TOOL"; then
+    grep -vx "$TOOL" "$FAV_FILE" >"$FAV_FILE.tmp"
+    mv "$FAV_FILE.tmp" "$FAV_FILE"
+    notify-send "BlackArch Launcher" "Removed from favorites: $TOOL"
+  else
+    echo "$TOOL" >>"$FAV_FILE"
+    notify-send "BlackArch Launcher" "Added to favorites: $TOOL"
+  fi
+}
+install_tool() {
+  local TOOL="$1"
+  clear
+  echo "${GREEN}Installing: $TOOL${RESET}"
+  echo "================================"
+  sudo pacman -S "$TOOL"
+  echo
+  echo "${GREEN}Installation complete!${RESET}"
+  echo "Press Enter to continue..."
+  read
+  generate_installed_tools_cache
+}
+uninstall_tool() {
+  local TOOL="$1"
+  clear
+  echo "${RED}Uninstalling: $TOOL${RESET}"
+  echo "================================"
+  sudo pacman -Rns "$TOOL"
+  echo
+  echo "${RED}Uninstallation complete!${RESET}"
+  echo "Press Enter to continue..."
+  read
+  generate_installed_tools_cache
+}
+run_tool() {
+  local TOOL="$1"
+  # Update recent
+  grep -v "^$TOOL\$" "$RECENT_FILE" >"$RECENT_FILE.tmp" 2>/dev/null
+  echo "$TOOL" >>"$RECENT_FILE.tmp"
+  tail -n 10 "$RECENT_FILE.tmp" >"$RECENT_FILE"
+  rm -f "$RECENT_FILE.tmp"
+  # Run in floating terminal
+  hyprctl dispatch exec "[float;size 70% 70%;center] $TERM -e bash -c 'sudo $TOOL; echo; echo Press Enter to close; read'" >/dev/null 2>&1 &
+}
+open_terminal_with_command() {
+  local TOOL="$1"
+  # Update recent
+  grep -v "^$TOOL\$" "$RECENT_FILE" >"$RECENT_FILE.tmp" 2>/dev/null
+  echo "$TOOL" >>"$RECENT_FILE.tmp"
+  tail -n 10 "$RECENT_FILE.tmp" >"$RECENT_FILE"
+  rm -f "$RECENT_FILE.tmp"
+
+  # Create a temporary script that will pre-fill the command
+  local TEMP_SCRIPT=$(mktemp)
+  cat >"$TEMP_SCRIPT" <<'SCRIPT_EOF'
+#!/bin/bash
+TOOL="$1"
+# Print the command for the user to see
+echo -e "\033[1;34m╔════════════════════════════════════════╗\033[0m"
+echo -e "\033[1;34m║  Command ready - edit as needed        ║\033[0m"
+echo -e "\033[1;34m╚════════════════════════════════════════╝\033[0m"
+echo ""
+# Use read with pre-filled input
+read -e -i "sudo $TOOL" -p "➜ " COMMAND
+# Execute the command if not empty
+if [[ -n "$COMMAND" ]]; then
+    eval "$COMMAND"
+fi
+echo ""
+echo "Press Enter to close..."
+read
+SCRIPT_EOF
+  chmod +x "$TEMP_SCRIPT"
+
+  # Open terminal and run the script, then delete it
+  hyprctl dispatch exec "[float;size 70% 70%;center] $TERM -e bash -c '$TEMP_SCRIPT \"$TOOL\"; rm -f $TEMP_SCRIPT'" >/dev/null 2>&1 &
+}
+# -----------------------------
+# TOOL ACTION MENU
+# -----------------------------
+tool_action_menu() {
+  local TOOL="$1"
+  # Build menu options based on install status
+  local MENU_OPTIONS=()
+  if is_installed "$TOOL"; then
+    MENU_OPTIONS+=("${GREEN}▶${RESET} Run Tool")
+    MENU_OPTIONS+=("${BLUE}⚡${RESET} Open Terminal (sudo $TOOL)")
+    MENU_OPTIONS+=("${RED}✖${RESET} Uninstall")
+  else
+    MENU_OPTIONS+=("${GREEN}⬇${RESET} Install")
+  fi
+  if is_favorite "$TOOL"; then
+    MENU_OPTIONS+=("${YELLOW}★${RESET} Remove from Favorites")
+  else
+    MENU_OPTIONS+=("${YELLOW}☆${RESET} Add to Favorites")
+  fi
+  MENU_OPTIONS+=("${BLUE}ℹ${RESET} Open Package URL")
+  while true; do
+    ACTION=$(printf "%s\n" "${MENU_OPTIONS[@]}" | fzf \
+      --ansi \
+      --prompt="▶ $TOOL - Select Action: " \
+      --preview="pacman -Si $TOOL 2>/dev/null || echo 'Package info not available'" \
+      --preview-window=right:60%:wrap \
+      --height=100% \
+      --border \
+      --cycle \
+      --reverse)
+    [[ -z "$ACTION" ]] && return # ESC or empty → go back
+    case "$ACTION" in
+    *"Run Tool"*)
+      run_tool "$TOOL"
+      return
+      ;;
+    *"Open Terminal"*)
+      open_terminal_with_command "$TOOL"
+      return
+      ;;
+    *"Install"*)
+      install_tool "$TOOL"
+      return
+      ;;
+    *"Uninstall"*)
+      uninstall_tool "$TOOL"
+      return
+      ;;
+    *"Add to Favorites"*)
+      toggle_favorite "$TOOL"
+      # Rebuild menu
+      tool_action_menu "$TOOL"
+      return
+      ;;
+    *"Remove from Favorites"*)
+      toggle_favorite "$TOOL"
+      # Rebuild menu
+      tool_action_menu "$TOOL"
+      return
+      ;;
+    *"Open Package URL"*)
+      # Extract URL from package description
+      URL=$(pacman -Si "$TOOL" 2>/dev/null | grep -i "^URL" | awk '{print $3}')
+      if [[ -n "$URL" ]]; then
+        xdg-open "$URL" &>/dev/null &
+        notify-send "BlackArch Launcher" "Opening $TOOL homepage in browser"
+      else
+        notify-send "BlackArch Launcher" "No URL found for $TOOL"
+      fi
+      ;;
+    esac
+  done
+}
+# -----------------------------
+# TOOLS MENU
+# -----------------------------
+tools_menu() {
+  local TOOLS=("$@")
+  if [[ ${#TOOLS[@]} -eq 0 ]]; then
+    notify-send "BlackArch Launcher" "No tools in this category"
+    return
+  fi
+  while true; do
+    # Load favorites
+    readarray -t FAVS <"$FAV_FILE"
+    # Build menu items with ⭐ for favorites
+    MENU_ITEMS=()
+    # ===== Installed tools =====
+    for t in "${TOOLS[@]}"; do
+      if is_installed "$t"; then
+        if is_favorite "$t"; then
+          MENU_ITEMS+=("⭐ $t")
+        else
+          MENU_ITEMS+=("$t")
+        fi
+      fi
+    done
+    # ===== Uninstalled tools =====
+    for t in "${TOOLS[@]}"; do
+      if ! is_installed "$t"; then
+        if is_favorite "$t"; then
+          MENU_ITEMS+=("⭐ $t ${RED}[not installed]${RESET}")
+        else
+          MENU_ITEMS+=("$t ${RED}[not installed]${RESET}")
+        fi
+      fi
+    done
+    # Show fzf menu
+    CHOICE=$(printf "%s\n" "${MENU_ITEMS[@]}" | fzf \
+      --ansi \
+      --prompt="▶ Select Tool: " \
+      --preview='
+    pkg=$(echo {} | sed -E "s/^\x1B\[[0-9;]*m//g; s/^⭐ //; s/ \[not installed\]//")
+    # Rebuild the title line with color
+    if pacman -Qi "$pkg" &>/dev/null; then
+        if [[ {} == ⭐* ]]; then
+            echo "⭐ $pkg"
+        else
+            echo "$pkg"
+        fi
+    else
+        if [[ {} == ⭐* ]]; then
+            echo -e "⭐ $pkg \e[31m[not installed]\e[0m"
+        else
+            echo -e "$pkg \e[31m[not installed]\e[0m"
+        fi
+    fi
+    echo
+    pacman -Si "$pkg"
+    ' \
+      --preview-window=right:60%:wrap \
+      --height=100% \
+      --border \
+      --cycle \
+      --reverse)
+    [[ -z "$CHOICE" ]] && break # ESC or empty → go back
+    TOOL="$(echo "$CHOICE" | sed 's/^⭐ //; s/ \[not installed\]//')"
+    # Show action menu for the selected tool
+    tool_action_menu "$TOOL"
+    # Regenerate cache in case install/uninstall happened
+    generate_installed_tools_cache
+  done
+}
+# -----------------------------
+# MAIN MENU
+# -----------------------------
+main_menu() {
+  MENU=()
+  KEYS=()
+  for g in $(pacman -Sg | awk '/^blackarch-/ {print $1}' | sort -u); do
+    [[ -n "${CATMAP[$g]}" ]] && MENU+=("${CATMAP[$g]}") && KEYS+=("$g")
+  done
+  MENU+=("${CATMAP[__FAVORITES__]}")
+  KEYS+=("__FAVORITES__")
+  MENU+=("${CATMAP[__RECENT__]}")
+  KEYS+=("__RECENT__")
+  MENU+=("${CATMAP[__SEARCH__]}")
+  KEYS+=("__SEARCH__")
+  CHOICE=$(printf "%s\n" "${MENU[@]}" | fzf \
+    --ansi \
+    --prompt="▶ BlackArch Launcher: " \
+    --height=100% \
+    --border \
+    --cycle \
+    --reverse)
+  [[ -z "$CHOICE" ]] && exit 0
+  for i in "${!MENU[@]}"; do
+    if [[ "${MENU[$i]}" == "$CHOICE" ]]; then
+      key="${KEYS[$i]}"
+      case "$key" in
+      "__SEARCH__")
+        readarray -t ALL_TOOLS < <(pacman -Sgg | grep blackarch | cut -d' ' -f2 | sort -u)
+        tools_menu "${ALL_TOOLS[@]}"
+        ;;
+      "__RECENT__")
+        if [[ -s "$RECENT_FILE" ]]; then
+          readarray -t RECENT_TOOLS < <(tac "$RECENT_FILE")
+          tools_menu "${RECENT_TOOLS[@]}"
+        else
+          notify-send "BlackArch Launcher" "No recent tools"
+        fi
+        ;;
+      "__FAVORITES__")
+        if [[ -s "$FAV_FILE" ]]; then
+          readarray -t FAV_TOOLS <"$FAV_FILE"
+          tools_menu "${FAV_TOOLS[@]}"
+        else
+          notify-send "BlackArch Launcher" "No favorite tools yet"
+        fi
+        ;;
+      *)
+        readarray -t CAT_TOOLS < <(pacman -Sg "$key" | awk 'NF>1 {print $2}')
+        tools_menu "${CAT_TOOLS[@]}"
+        ;;
+      esac
+      main_menu
+      return
+    fi
+  done
+}
+# -----------------------------
+# START
+# -----------------------------
+main_menu
