@@ -6,6 +6,11 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 
 > Designed for **Hyprland / Wayland users**, but works on any Arch-based BlackArch setup.
 
+## showcase
+
+https://github.com/user-attachments/assets/653434d8-6152-4fd3-addc-33b76dbbebd4
+
+
 ---
 
 ## ✨ Features
