@@ -6,58 +6,70 @@ Browse **hundreds of BlackArch tools by category**, view **full package descript
 
 > Designed for **Hyprland / Wayland users**, but works on any Arch-based BlackArch setup.
 
-## showcase
+## Showcase
 
-https://github.com/user-attachments/assets/653434d8-6152-4fd3-addc-33b76dbbebd4
-
+![BlackArch Tool Manager Demo](https://www.youtube.com/watch?v=PxLzP1xjdSI)
 
 ---
 
 ## ✨ Features
 
 ### 📂 Category-Based Navigation
+
 - Automatically loads **all BlackArch categories**
 - Clean, emoji-enhanced category list
 - No empty or broken categories
 
+![Alt text](./assets/category-menu.png "Category Menu")
+
 ### 🔍 Search All Tools
+
 - Search **every BlackArch tool** instantly
 - Fuzzy matching powered by `fzf`
 
 ### ⭐ Favorites System
+
 - Mark tools as favorites
 - Favorites persist across sessions
 - ⭐ icon displayed next to favorite tools
 - Dedicated **Favorites** category
 
 ### 🕘 Recent Tools
+
 - Automatically tracks recently used tools
 - Quick access to last executed tools
 
 ### 📦 Install / Uninstall from GUI
+
 - Install tools directly via `pacman`
 - Uninstall cleanly with dependency removal
 - Installed tools detected automatically
 
 ### 🧠 Full Tool Information
+
 - Scrollable **full package descriptions**
 - Uses `pacman -Si`
 - Preview pane supports long descriptions
 
 ### 🚀 Run Tools in Floating Terminal
+
 - Tools run inside a **floating Kitty terminal**
 - Terminal stays open after execution
 - Password prompt handled correctly
 
 ### ⚡ Open Pre-Filled Command Terminal
+
 - Opens terminal with:
+
   ```bash
   sudo toolname
   ```
+
 - Editable before execution
 - Perfect for tools with arguments
 
 ### 🌐 Open Tool Homepage
+
 - Automatically extracts tool URL
 - Opens in default browser
 
@@ -117,7 +129,7 @@ All user data is stored safely in:
 - `hyprctl` (for floating windows)
 - `notify-send`
 
-### Install dependencies:
+### Install dependencies
 
 ```bash
 sudo pacman -S fzf kitty libnotify
@@ -130,13 +142,13 @@ sudo pacman -S fzf kitty libnotify
 Make the script executable:
 
 ```bash
-chmod +x blackarch-install-launcher-gui.sh
+chmod +x blackarch-tool-manager
 ```
 
 Run it:
 
 ```bash
-./blackarch-install-launcher-gui.sh
+./blackarchtool-manager
 ```
 
 **That's it.**  
